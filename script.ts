@@ -14,32 +14,34 @@ function getWords(str: string): Word[] {
     let currentValue: string = "";
     let currentType: WordType = WordType.Text;
 
+    const changeType = () => {
+        currentType = currentType == WordType.Text ? WordType.Ignore : WordType.Text;
+    };
+    const pushWord = (type: WordType) => {
+        if (currentValue.length > 0) {
+            words.push({type: type, value: currentValue});
+            currentValue = "";
+        }
+    };
+
+
     for (const char of str) {
 
         if (/(\s|[.,\/#!$%\^&\*;:{}=\-_`~()\[\]])/.test(char)) {
 
             if (currentType == WordType.Text) {
 
-                currentType = WordType.Ignore;
-
-                //Commit previous word
-                if (currentValue.length > 0) {
-                    words.push({type: WordType.Text, value: currentValue});
-                    currentValue = "";
-                }
+                changeType();
+                pushWord(WordType.Text);
             }
 
         } else {
 
+            // @ts-ignore
             if (currentType == WordType.Ignore) {
 
-                currentType = WordType.Text;
-
-                //Commit previous word
-                if (currentValue.length > 0) {
-                    words.push({type: WordType.Ignore, value: currentValue});
-                    currentValue = "";
-                }
+                changeType();
+                pushWord(WordType.Ignore);
             }
 
         }
@@ -67,15 +69,40 @@ function strFromWords(words: Word[]): string {
     return result;
 }
 
+function isValidFerbLatin(str: string): boolean {
+    return str.length >= 4 && str.endsWith("erb");
+}
+
 function convertToFerbLatin(str: string): string {
     let words = getWords(str);
 
     words = words.map(({type, value}) => {
-        //Ignore newlines
+
         if (type == WordType.Text) {
 
             const firstLetter = value[0];
-            value = `${value.substring(1)}${firstLetter}erb`
+            value = `${value.substring(1)}${firstLetter}erb`;
+
+        }
+
+        return {type, value};
+    });
+
+    return strFromWords(words);
+}
+
+function convertToNormal(str: string): string {
+    let words = getWords(str);
+
+    words = words.map(({type, value}) => {
+
+        if (type == WordType.Text && isValidFerbLatin(value)) {
+
+            //Remove erb
+            value = value.substring(0, value.length - 3);
+
+            const lastLetter = value[value.length - 1];
+            value = `${lastLetter}${value.substring(0, value.length - 1)}`;
 
         }
 
@@ -87,13 +114,19 @@ function convertToFerbLatin(str: string): string {
 
 (() => {
 
-    const inputTextarea = document.getElementById("input") as HTMLTextAreaElement;
-    const outputTextarea = document.getElementById("output") as HTMLTextAreaElement;
+    const normalTextarea = document.getElementById("normal") as HTMLTextAreaElement;
+    const ferbTextarea = document.getElementById("ferb") as HTMLTextAreaElement;
 
-    const button = document.getElementById("button") as HTMLButtonElement;
+    const nfButton = document.getElementById("nf-button") as HTMLButtonElement;
 
-    button.addEventListener("click", () => {
-        outputTextarea.value = convertToFerbLatin(inputTextarea.value);
+    nfButton.addEventListener("click", () => {
+        ferbTextarea.value = convertToFerbLatin(normalTextarea.value);
+    });
+
+    const fnButton = document.getElementById("fn-button") as HTMLButtonElement;
+
+    fnButton.addEventListener("click", () => {
+        normalTextarea.value = convertToNormal(ferbTextarea.value);
     });
 
 })();

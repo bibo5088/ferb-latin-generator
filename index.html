@@ -42,8 +42,8 @@
     .grid-container {
         display: grid;
         grid-template-columns: 1fr auto 1fr;
-        grid-template-rows: auto 1fr;
-        grid-template-areas: "title title title" "input button output";
+        grid-template-rows: auto 1fr 1fr;
+        grid-template-areas: "title title title" "normal nf-button ferb" "normal fn-button ferb";
         grid-gap: 1em 1em;
     }
 
@@ -52,22 +52,28 @@
         font-weight: bold
     }
 
-    .input {
-        grid-area: input;
+    .normal {
+        grid-area: normal;
         resize: vertical;
         height: 100%;
         min-height: 10em;
     }
 
-    .output {
-        grid-area: output;
+    .ferb {
+        grid-area: ferb;
         resize: vertical;
         height: 100%;
         min-height: 10em;
     }
 
-    .button {
-        grid-area: button;
+    .nf-button {
+        grid-area: nf-button;
+
+        align-self: center;
+    }
+
+    .fn-button {
+        grid-area: fn-button;
 
         align-self: center;
     }
@@ -76,9 +82,10 @@
 <body class="container grid-container">
 
 <h1 class="title">Ferb Latin Generator</h1>
-<textarea id="input" class="input" placeholder="Insert your text here"></textarea>
-<button id="button" class="button">-></button>
-<textarea id="output" class="output" readonly></textarea>
+<textarea id="normal" class="normal" placeholder="Insert your text here"></textarea>
+<button id="nf-button" class="nf-button">-></button>
+<button id="fn-button" class="fn-button"><-</button>
+<textarea id="ferb" class="ferb" placeholder="nsertIerb ouryerb extterb ereherb"></textarea>
 
 </body>
 
